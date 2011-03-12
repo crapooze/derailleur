@@ -155,6 +155,25 @@ module Derailleur
       app_node.graft!(split_node)
     end
 
+    # Similar to get route, but also interprets nodes names as keys for a hash.
+    # The values in the parameters hash are the string corresponding to the
+    # nodes in the path.
+    # A specific key is :splat, which correspond to the remaining chunks in the
+    # paths.
+    # Does NOT take care of key collisions. This should be taken care of at the
+    # application level.
+    def get_route_with_params(path)
+      params = {:splat => []}
+      route = get_route(path) do |node, val|
+        if node.wildcard?
+          params[node.name] = val 
+        elsif node.absorbent?
+          params[:splat] << val 
+        end
+      end
+      [route, params]
+    end
+
     # Method implemented to comply to the Rack specification.  see
     # http://rack.rubyforge.org/doc/files/SPEC.html to understand what to
     # return.
@@ -176,14 +195,7 @@ module Derailleur
       begin
         path = env['PATH_INFO'].sub(/\.\w+$/,'') #ignores the extension if any
         ctx = {}
-        params = {:splat => []}
-        route = get_route(path) do |node, val|
-          if node.wildcard?
-            params[node.name] = val 
-          elsif node.absorbent?
-            params[:splat] << val 
-          end
-        end
+        route, params = get_route_with_params(path)
         ctx['derailleur.node'] = route
         ctx['derailleur.params'] = params
         ctx['derailleur'] = self
