@@ -13,7 +13,7 @@ The life of an HTTP incoming request is the following (in the case where everyth
 == Routing URL in Derailleur
 
 Routing is the key innovation of Derailleur, Derailleur by default uses a kind
-of Trie structure (actually it's closer to a Radix-Tree if you prefer, but the
+of Tree structure (actually it's closer to a Radix-Tree if you prefer, but the
 labels are on the nodes, not on the edges).
 
 The alphabet used in Derailleur is not a per-letter, but a per-url-atom one. A
