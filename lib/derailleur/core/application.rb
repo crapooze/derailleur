@@ -79,18 +79,31 @@ module Derailleur
     # Will (optionally) consecutively yield all the [node, chunk_name]
     # this is useful when you want to interpret the members of the path
     # as a parameter.
-    def get_route(path)
+    def get_route_silent(path)
       current_node = routes
       chunk_path(path).each do |chunk|
         unless current_node.absorbent?
           current_node = current_node.child_for_name(chunk)
-          raise NoSuchRoute, "no such path #{path}" unless current_node
+          return nil unless current_node
         end
         yield current_node, chunk if block_given?
       end
       current_node
     end
-
+    
+    # Same as get_route_silent but raise a 
+    # NoSuchRoute error if there is no matching route.
+    def get_route(path)
+      node = if block_given?
+               get_route_silent(path) do |node,chunk|
+                 yield node, chunk 
+               end
+             else
+               get_route_silent(path) 
+             end
+      raise NoSuchRoute, "no such path #{path}" unless node
+      node
+    end
 
     # Registers an handler for a given path.
     # The path will be interpreted as an absolute path prefixed by '/' .
