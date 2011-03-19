@@ -39,8 +39,9 @@ route lookup to be more efficiently.
 ## Handling HTTP requests ##
 
 There are conceptually two kinds of handling mechanism in Derailleur:
-- routing handler generator, which is a low level handler that developpers do not usually touch
-- application handler, which is what a developper writes
+
+* routing handler generator, which is a low level handler that developpers do not usually touch
+* application handler, which is what a developper writes
 
 ### Application Handler ###
 
@@ -60,9 +61,9 @@ The routing handler generator is slightly different:
   * the handler object associated to the application node for the HTTP incoming request
   * the Rack environment
   * the application context hash with three references:
-    * 'derailleur' : current Derailleur application
-    * 'derailleur.node' : the application node for the HTTP incoming request
-    * 'derailleur.params' : the route parameters if any wildcard/splat substitution happened
+    * derailleur – current Derailleur application
+    * derailleur.node – the application node for the HTTP incoming request
+    * derailleur.params – the route parameters if any wildcard/splat substitution happened
 * The result of :new complies to the application handlers specification
 
 ### The DefaultHandler class ###
