@@ -56,7 +56,7 @@ To be a compliant application handler, you must:
 
 The routing handler generator is slightly different:
 
-* The routing handler generator respond to :new
+* The routing handler generator responds to :new
 * Three parameters are passed to :new 
   * the handler object associated to the application node for the HTTP incoming request
   * the Rack environment
