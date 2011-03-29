@@ -15,7 +15,7 @@ class MyHandler < Derailleur::RackHandler
 end
 
 module ExampleApplication
-  extend Derailleur::Application
+  extend Derailleur::Application::RackApplication
 
   examples =  ["/block", "/handler-instance", "/handler-class", 
     "/rack-lobster", "/parameter/foo", "/splat/a/blob", 

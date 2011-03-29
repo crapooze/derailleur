@@ -5,7 +5,7 @@ require 'derailleur'
 require 'derailleur/core/hash_trie'
 
 module ExampleApplication
-  extend Derailleur::Application
+  extend Derailleur::Application::RackApplication
 
   self.default_root_node_type = Derailleur::HashTrie
 

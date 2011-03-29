@@ -7,7 +7,7 @@ require 'derailleur/core/hash_trie'
 # ab against it and it should beat sinatra for the same routes,
 # or even sinatra with wildcards/regexp routes
 module ExampleApplication
-  extend Derailleur::Application
+  extend Derailleur::Application::RackApplication
   self.default_root_node_type = Derailleur::HashTrie #=> 700Mo
 
   100.times do |t|

@@ -14,7 +14,7 @@ class TextHandler
 end
 
 module ExampleApplication
-  extend Derailleur::Application
+  extend Derailleur::Application::RackApplication
 
   def self.embedded_arrays_to_string(map, idx=0, total='')
     str = ' ' * total.size
