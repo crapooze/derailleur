@@ -13,7 +13,7 @@ module Derailleur
   # See also Grease#initialize_HTTP (you should call it if you don't use 
   # Grease's initialize method.
   module Grease
-    include Derailleur::Application
+    include Derailleur::Application::RackApplication
 
     Registration = Struct.new(:sym, :path, :handler)
 

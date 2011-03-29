@@ -13,14 +13,7 @@ module Derailleur
   # custom routes' node, HTTP methods dispatcher, and handlers.
   module Application
 
-    attr_writer :default_handler, :default_root_node_type, :default_dispatcher,
-      :default_internal_error_handler
-
-    # The default error handler ( Derailleur::InternalErrorHandler )
-    def default_internal_error_handler
-      @default_internal_error_handler ||= InternalErrorHandler
-    end
-
+    attr_writer :default_root_node_type
     # The default root node type ( Derailleur::ArrayTrie )
     # You could change it to ( Derailleur::HashTrie ) for better performance.
     # The rule of thumb is: benchmark your application with both and pick the 
@@ -32,18 +25,6 @@ module Derailleur
     # The default node type (is the node_type of the default_root_node_type )
     def default_node_type
       default_root_node_type.node_type
-    end
-
-    # The default handler ( Derailleur::DefaultRackHandler )
-    # See Derailleur::Handler to understand how to build your own
-    def default_handler
-      @default_handler ||= DefaultRackHandler
-    end
-
-    # The default HTTP method dispatcher ( Derailleur::Dispatcher )
-    # See Derailleur::Dispatcher if you want a personal one
-    def default_dispatcher
-      @default_dispatcher ||= Dispatcher
     end
 
     # An object representing the routes. Usually, it is the root of a Trie
@@ -90,7 +71,7 @@ module Derailleur
       end
       current_node
     end
-    
+
     # Same as get_route_silent but raise a 
     # NoSuchRoute error if there is no matching route.
     def get_route(path)
@@ -103,6 +84,101 @@ module Derailleur
              end
       raise NoSuchRoute, "no such path #{path}" unless node
       node
+    end
+
+
+    # Split a whole branch of the application at the given path, and graft the
+    # branch to the app in second parameter.
+    # This method does NOT prevents you from cancelling handlers in the second
+    # app if any. Because it does not check for handlers in the receiving
+    # branch. Use with care.  See ArrayNode#graft!
+    def split_to!(path, app)
+      app_node = app.build_route(path)
+
+      split_node = get_route(normalize(path))
+      split_node.prune!
+
+      app_node.graft!(split_node)
+    end
+
+    # Similar to get route, but also interprets nodes names as keys for a hash.
+    # The values in the parameters hash are the string corresponding to the
+    # nodes in the path.
+    # A specific key is :splat, which correspond to the remaining chunks in the
+    # paths.
+    # Does NOT take care of key collisions. This should be taken care of at the
+    # application level.
+    def get_route_with_params(path)
+      params = {:splat => []}
+      route = get_route(path) do |node, val|
+        if node.wildcard?
+          params[node.name] = val 
+        elsif node.absorbent?
+          params[:splat] << val 
+        end
+      end
+      [route, params]
+    end
+
+
+    module RackApplication
+      include Application
+
+      attr_writer :default_internal_error_handler
+      attr_writer :default_handler
+      attr_writer :default_dispatcher
+
+      # The default HTTP method dispatcher ( Derailleur::Dispatcher )
+      # See Derailleur::Dispatcher if you want a personal one
+      def default_dispatcher
+        @default_dispatcher ||= Dispatcher
+      end
+
+      # The default error handler ( Derailleur::InternalErrorHandler )
+      def default_internal_error_handler
+        @default_internal_error_handler ||= InternalErrorHandler
+      end
+
+      # The default handler ( Derailleur::DefaultRackHandler )
+      # See Derailleur::Handler to understand how to build your own
+      def default_handler
+        @default_handler ||= DefaultRackHandler
+      end
+
+      # Method implemented to comply to the Rack specification.  see
+      # http://rack.rubyforge.org/doc/files/SPEC.html to understand what to
+      # return.
+      #
+      # If everything goes right, an instance of default_handler will serve
+      # the request.
+      #
+      # The routing handler will be created with three params
+      # - the application handler contained in the dispatcher
+      # - the Rack env
+      # - a context hash with three keys:
+      #   * 'derailleur' at self, i.e., a reference to the application
+      #   * 'derailleur.params' with the parameters/spalt in the path
+      #   * 'derailleur.node' the node responsible for handling this path
+      # 
+      # If there is any exception during this, it will be catched and the 
+      # default_internal_error_handler will be called.
+      def call(env)
+        begin
+          path = env['PATH_INFO'].sub(/\.\w+$/,'') #ignores the extension if any
+          ctx = {}
+          route, params = get_route_with_params(path)
+          ctx['derailleur.node'] = route
+          ctx['derailleur.params'] = params
+          ctx['derailleur'] = self
+          dispatcher = route.content
+          raise NoSuchRoute, "no dispatcher for #{path}" if dispatcher.nil?
+          handler = dispatcher.send(env['REQUEST_METHOD'])
+          raise NoSuchRoute, "no handler for valid path: #{path}" if handler.nil?
+          default_handler.new(handler, env, ctx).to_rack_output
+        rescue Exception => err
+          default_internal_error_handler.new(err, env, ctx).to_rack_output
+        end
+      end
     end
 
     # Registers an handler for a given path.
@@ -151,74 +227,6 @@ module Derailleur
         end
       else
         node.hand_off_to! default_node_type.new(node.name)
-      end
-    end
-
-    # Split a whole branch of the application at the given path, and graft the
-    # branch to the app in second parameter.
-    # This method does NOT prevents you from cancelling handlers in the second
-    # app if any. Because it does not check for handlers in the receiving
-    # branch. Use with care.  See ArrayNode#graft!
-    def split_to!(path, app)
-      app_node = app.build_route(path)
-
-      split_node = get_route(normalize(path))
-      split_node.prune!
-
-      app_node.graft!(split_node)
-    end
-
-    # Similar to get route, but also interprets nodes names as keys for a hash.
-    # The values in the parameters hash are the string corresponding to the
-    # nodes in the path.
-    # A specific key is :splat, which correspond to the remaining chunks in the
-    # paths.
-    # Does NOT take care of key collisions. This should be taken care of at the
-    # application level.
-    def get_route_with_params(path)
-      params = {:splat => []}
-      route = get_route(path) do |node, val|
-        if node.wildcard?
-          params[node.name] = val 
-        elsif node.absorbent?
-          params[:splat] << val 
-        end
-      end
-      [route, params]
-    end
-
-    # Method implemented to comply to the Rack specification.  see
-    # http://rack.rubyforge.org/doc/files/SPEC.html to understand what to
-    # return.
-    #
-    # If everything goes right, an instance of default_handler will serve
-    # the request.
-    #
-    # The routing handler will be created with three params
-    # - the application handler contained in the dispatcher
-    # - the Rack env
-    # - a context hash with three keys:
-    #   * 'derailleur' at self, i.e., a reference to the application
-    #   * 'derailleur.params' with the parameters/spalt in the path
-    #   * 'derailleur.node' the node responsible for handling this path
-    # 
-    # If there is any exception during this, it will be catched and the 
-    # default_internal_error_handler will be called.
-    def call(env)
-      begin
-        path = env['PATH_INFO'].sub(/\.\w+$/,'') #ignores the extension if any
-        ctx = {}
-        route, params = get_route_with_params(path)
-        ctx['derailleur.node'] = route
-        ctx['derailleur.params'] = params
-        ctx['derailleur'] = self
-        dispatcher = route.content
-        raise NoSuchRoute, "no dispatcher for #{path}" if dispatcher.nil?
-        handler = dispatcher.send(env['REQUEST_METHOD'])
-        raise NoSuchRoute, "no handler for valid path: #{path}" if handler.nil?
-        default_handler.new(handler, env, ctx).to_rack_output
-      rescue Exception => err
-        default_internal_error_handler.new(err, env, ctx).to_rack_output
       end
     end
   end
