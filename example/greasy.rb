@@ -1,7 +1,7 @@
 
 $LOAD_PATH << 'lib'
 
-require 'derailleur'
+require 'derailleur/base/grease'
 
 class MyApplication
   include Derailleur::Grease

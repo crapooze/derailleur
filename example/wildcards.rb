@@ -1,11 +1,11 @@
 
 $LOAD_PATH << 'lib'
 
-require 'derailleur'
+require 'derailleur/base/application'
 require 'derailleur/core/hash_trie'
 
 module ExampleApplication
-  extend Derailleur::Application::RackApplication
+  extend Derailleur::RackApplication
 
   self.default_root_node_type = Derailleur::HashTrie
 

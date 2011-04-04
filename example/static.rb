@@ -2,7 +2,8 @@
 $LOAD_PATH << 'lib'
 
 require 'derailleur'
-require 'derailleur/core/handler'
+require 'derailleur/base/application'
+require 'derailleur/rack/handler'
 
 class MyHandler < Derailleur::RackHandler
   attr_writer :message
@@ -15,7 +16,7 @@ class MyHandler < Derailleur::RackHandler
 end
 
 module ExampleApplication
-  extend Derailleur::Application::RackApplication
+  extend Derailleur::RackApplication
 
   examples =  ["/block", "/handler-instance", "/handler-class", 
     "/rack-lobster", "/parameter/foo", "/splat/a/blob", 

@@ -1,6 +1,6 @@
 
 $LOAD_PATH << 'lib'
-require 'derailleur'
+require 'derailleur/base/application'
 
 class TextHandler 
   attr_accessor :text
@@ -14,7 +14,7 @@ class TextHandler
 end
 
 module ExampleApplication
-  extend Derailleur::Application::RackApplication
+  extend Derailleur::RackApplication
 
   def self.embedded_arrays_to_string(map, idx=0, total='')
     str = ' ' * total.size

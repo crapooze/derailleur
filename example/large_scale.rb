@@ -1,13 +1,13 @@
 
 $LOAD_PATH << 'lib'
-require 'derailleur'
+require 'derailleur/base/application'
 require 'derailleur/core/hash_trie'
 
 # This example creates 10k routes, you can run
 # ab against it and it should beat sinatra for the same routes,
 # or even sinatra with wildcards/regexp routes
 module ExampleApplication
-  extend Derailleur::Application::RackApplication
+  extend Derailleur::RackApplication
   self.default_root_node_type = Derailleur::HashTrie #=> 700Mo
 
   100.times do |t|

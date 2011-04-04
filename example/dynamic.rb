@@ -1,10 +1,10 @@
 
 $LOAD_PATH << 'lib'
 
-require 'derailleur'
+require 'derailleur/base/application'
 
 module ExampleApplication
-  extend Derailleur::Application::RackApplication
+  extend Derailleur::RackApplication
 
   @@index = 0
 
