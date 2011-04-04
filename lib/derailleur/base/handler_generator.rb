@@ -1,5 +1,5 @@
 
-require 'derailleur/core/handler'
+require 'derailleur/rack/handler'
 require 'derailleur/base/context'
 
 module Derailleur

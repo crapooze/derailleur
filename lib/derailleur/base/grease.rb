@@ -1,8 +1,8 @@
 
 require 'derailleur/base/application'
+require 'derailleur/base/handler_generator'
 
 module Derailleur
-  autoload :HandlerGenerator, 'derailleur/base/handler_generator'
   # The Grease is the module that helps you code at a high level,
   # with blocks.
   # Basically, including this method in a class makes the HTTP 
