@@ -1,4 +1,8 @@
 # Derailleur #
+Derailleur was initially a Rack-only module.
+Now some cleaning has been done (still ongoing), and Derailleur-core can be used wherever paths mappings are involved.
+
+# Derailleur for Rack applications #
 
 The life of an HTTP incoming request is the following (in the case where everything works):
 
@@ -73,3 +77,5 @@ The routing handler generator is slightly different:
 
 
 ### The RackApplicationHandler class ###
+
+# Derailleur for non-Rack applications #
