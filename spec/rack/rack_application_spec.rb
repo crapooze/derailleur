@@ -1,11 +1,11 @@
 
 require File.join(File.dirname(__FILE__), '..', 'spec_helper')
-require 'derailleur/core/application'
+require 'derailleur/rack/application'
 
-describe Application::RackApplication, "basics" do
+describe RackApplication, "basics" do
   before :each do
     @app = Module.new do
-      extend Application::RackApplication
+      extend RackApplication
     end
   end
 
@@ -37,10 +37,10 @@ describe Application::RackApplication, "basics" do
   end
 end
 
-describe Application::RackApplication, "path manipulations and registration" do
+describe RackApplication, "path manipulations and registration" do
   before :each do
     @app = Module.new do
-      extend Application::RackApplication
+      extend RackApplication
     end
   end
 
@@ -117,10 +117,10 @@ describe Application::RackApplication, "path manipulations and registration" do
   end
 end
 
-describe Application::RackApplication, "route getting" do
+describe RackApplication, "route getting" do
   before :each do
     @app = Module.new do
-      extend Application::RackApplication
+      extend RackApplication
     end
   end
 
@@ -153,10 +153,10 @@ describe Application::RackApplication, "route getting" do
   end
 end
 
-describe Application::RackApplication, "route unregistration" do
+describe RackApplication, "route unregistration" do
   before :each do
     @app = Module.new do
-      extend Application::RackApplication
+      extend RackApplication
     end
   end
 
@@ -188,13 +188,13 @@ describe Application::RackApplication, "route unregistration" do
   end
 end
 
-describe Application::RackApplication, "route unregistration" do
+describe RackApplication, "route unregistration" do
   before :each do
     @app1 = Module.new do
-      extend Application::RackApplication
+      extend RackApplication
     end
     @app2 = Module.new do
-      extend Application::RackApplication
+      extend RackApplication
     end
   end
 
