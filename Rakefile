@@ -20,10 +20,12 @@ spec = Gem::Specification.new do |s|
           'Rakefile', 
           'TODO', 
           'lib/derailleur.rb',
+
           'lib/derailleur/base/application.rb',
           'lib/derailleur/base/grease.rb',
           'lib/derailleur/base/context.rb',
           'lib/derailleur/base/handler_generator.rb',
+
           'lib/derailleur/core/application.rb',
           'lib/derailleur/core/array_trie.rb',
           'lib/derailleur/core/dispatcher.rb',
@@ -31,6 +33,11 @@ spec = Gem::Specification.new do |s|
           'lib/derailleur/core/handler.rb',
           'lib/derailleur/core/hash_trie.rb',
           'lib/derailleur/core/trie.rb',
+
+          'lib/derailleur/rack/application.rb',
+          'lib/derailleur/rack/dispatcher.rb',
+          'lib/derailleur/rack/errors.rb',
+          'lib/derailleur/rack/handler.rb',
         ]
 
         s.require_path = 'lib'
