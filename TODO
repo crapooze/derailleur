@@ -1,2 +1,1 @@
 * separate classes to hold handoff and grafting logic in trienodes
-* filesystem trees for non-HTTP things
