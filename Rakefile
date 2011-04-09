@@ -13,6 +13,7 @@ spec = Gem::Specification.new do |s|
         s.author = Derailleur::AUTHORS.first
         s.homepage = Derailleur::WEBSITE
         s.summary = "A super-fast Rack web framework"
+        s.description = Derailleur::DESCRIPTION
         s.email = "crapooze@gmail.com"
         s.platform = Gem::Platform::RUBY
 
