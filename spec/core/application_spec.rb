@@ -78,3 +78,29 @@ describe Application, "path manipulations and registration" do
   end
 end
 
+describe Application, "path retrieval" do
+  before :each do
+    @app = Module.new do
+      extend Application
+    end
+    @app.build_route('/foo/bar')
+  end
+
+  it "should find the route" do
+    @app.get_route('/foo').should_not be_nil
+    @app.get_route('/foo/bar').should_not be_nil
+  end
+
+  it "should find the route silently" do
+    @app.get_route_silent('/foo').should_not be_nil
+    @app.get_route_silent('/foo/bar').should_not be_nil
+  end
+
+  it "should complain about not finding the route" do
+    lambda { @app.get_route('/bar')}.should raise_error
+  end
+
+  it "should not complain about not finding the route silently" do
+    lambda { @app.get_route_silent('/bar')}.should_not raise_error
+  end
+end
